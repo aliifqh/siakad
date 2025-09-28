@@ -1,36 +1,193 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SIAKAD STIM Surakarta
 
-## Getting Started
+Sistem Informasi Akademik untuk STIM Surakarta yang dibangun dengan Next.js, TypeScript, dan Prisma.
 
-First, run the development server:
+## Fitur
+
+- ✅ **Authentication System** - Login/Register dengan JWT
+- ✅ **Role-based Access** - Admin, Dosen, Mahasiswa
+- ✅ **Database Schema** - Mahasiswa, Dosen, Mata Kuliah, KRS, Nilai
+- ✅ **Dashboard** - Interface berbeda berdasarkan role
+- 🔄 **CRUD Operations** - Manajemen data akademik
+- 🔄 **KRS System** - Kartu Rencana Studi
+- 🔄 **PDDIKTI Integration** - Sinkronisasi dengan PDDIKTI
+
+## Tech Stack
+
+- **Frontend**: Next.js 15, React 19, TypeScript
+- **Styling**: Tailwind CSS
+- **Database**: PostgreSQL dengan Prisma ORM
+- **Authentication**: JWT (jsonwebtoken)
+- **Icons**: Lucide React
+
+## Setup Development
+
+### 1. Install Dependencies
+
+```bash
+npm install
+```
+
+### 2. Setup Database
+
+Buat file `.env.local` di root project:
+
+```env
+# Database
+DATABASE_URL="postgresql://username:password@localhost:5432/siakad_stim"
+
+# JWT Secret
+JWT_SECRET="your-super-secret-jwt-key-change-this-in-production"
+
+# PDDIKTI API (akan diisi nanti)
+PDDIKTI_API_URL="https://api.pddikti.kemdikbud.go.id"
+PDDIKTI_API_KEY="your-pddikti-api-key"
+
+# App Configuration
+NEXTAUTH_URL="http://localhost:3000"
+NEXTAUTH_SECRET="your-nextauth-secret"
+```
+
+### 3. Setup Database
+
+```bash
+# Generate Prisma client
+npx prisma generate
+
+# Run database migration
+npx prisma migrate dev --name init
+
+# (Optional) Seed database dengan data sample
+npx prisma db seed
+```
+
+### 4. Run Development Server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Aplikasi akan berjalan di [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Struktur Project
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+src/
+├── app/
+│   ├── api/                    # API Routes
+│   │   ├── auth/              # Authentication endpoints
+│   │   ├── students/          # Student management
+│   │   ├── lecturers/         # Lecturer management
+│   │   ├── courses/           # Course management
+│   │   └── krs/               # KRS management
+│   ├── auth/                  # Auth pages (login, register)
+│   ├── dashboard/             # Dashboard pages
+│   └── layout.tsx            # Root layout
+├── components/                # Reusable components
+│   ├── ui/                   # Basic UI components
+│   ├── forms/                # Form components
+│   └── layout/               # Layout components
+├── lib/                      # Utilities
+│   ├── database.ts           # Prisma client
+│   └── auth.ts               # Auth utilities
+└── types/                    # TypeScript types
+    └── index.ts              # Type definitions
+```
 
-## Learn More
+## Database Schema
 
-To learn more about Next.js, take a look at the following resources:
+### Users
+- id, email, password, role, timestamps
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Students
+- id, nim, name, email, phone, address, program, semester, status, userId
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Lecturers
+- id, nidn, name, email, phone, position, department, userId
 
-## Deploy on Vercel
+### Courses
+- id, code, name, credits, semester, description, lecturerId
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### KRS (Kartu Rencana Studi)
+- id, studentId, courseId, semester, year, status
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Grades
+- id, studentId, courseId, semester, year, grade, score
+
+## API Endpoints
+
+### Authentication
+- `POST /api/auth/login` - Login user
+- `POST /api/auth/register` - Register new user
+
+### Students
+- `GET /api/students` - Get all students
+- `POST /api/students` - Create new student
+- `GET /api/students/[id]` - Get student by ID
+- `PUT /api/students/[id]` - Update student
+- `DELETE /api/students/[id]` - Delete student
+
+### Lecturers
+- `GET /api/lecturers` - Get all lecturers
+- `POST /api/lecturers` - Create new lecturer
+- `GET /api/lecturers/[id]` - Get lecturer by ID
+- `PUT /api/lecturers/[id]` - Update lecturer
+- `DELETE /api/lecturers/[id]` - Delete lecturer
+
+### Courses
+- `GET /api/courses` - Get all courses
+- `POST /api/courses` - Create new course
+- `GET /api/courses/[id]` - Get course by ID
+- `PUT /api/courses/[id]` - Update course
+- `DELETE /api/courses/[id]` - Delete course
+
+### KRS
+- `GET /api/krs` - Get all KRS
+- `POST /api/krs` - Create new KRS
+- `GET /api/krs/[id]` - Get KRS by ID
+- `PUT /api/krs/[id]` - Update KRS
+- `DELETE /api/krs/[id]` - Delete KRS
+
+## Deployment
+
+### cPanel Deployment
+
+1. **Build Project**
+   ```bash
+   npm run build
+   ```
+
+2. **Upload Files**
+   - Upload semua file ke `public_html`
+   - Pastikan file `.env.local` sudah di-set di cPanel
+
+3. **Setup Database**
+   - Buat database PostgreSQL di cPanel
+   - Update `DATABASE_URL` di environment variables
+   - Run migration: `npx prisma migrate deploy`
+
+4. **Configure Node.js App**
+   - Gunakan tab "Node.js App" di cPanel
+   - Set startup file ke `server.js`
+   - Install dependencies: `npm install`
+
+## Next Steps
+
+1. **Implementasi CRUD** untuk semua entitas
+2. **Sistem KRS** yang lengkap
+3. **Integrasi PDDIKTI** API
+4. **Sistem Penilaian** dan transkrip
+5. **Laporan Akademik**
+6. **Dashboard Analytics**
+
+## Contributing
+
+1. Fork repository
+2. Create feature branch
+3. Commit changes
+4. Push to branch
+5. Create Pull Request
+
+## License
+
+MIT License - lihat file LICENSE untuk detail.
