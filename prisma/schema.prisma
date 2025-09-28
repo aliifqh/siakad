@@ -41,6 +41,8 @@ model Student {
 
   krs         KRS[]
   grades      Grade[]
+  financialAccount FinancialAccount?
+  skpi        SKPI[]
 
   @@map("students")
 }
@@ -59,6 +61,7 @@ model Lecturer {
   updatedAt   DateTime @updatedAt
 
   courses     Course[]
+  schedules   Schedule[]
 
   @@map("lecturers")
 }
@@ -77,6 +80,7 @@ model Course {
 
   krs         KRS[]
   grades      Grade[]
+  schedules   Schedule[]
 
   @@map("courses")
 }
@@ -133,4 +137,209 @@ enum KRSStatus {
   PENDING
   APPROVED
   REJECTED
+}
+
+model PMBApplicant {
+  id          String   @id @default(cuid())
+  name        String
+  email       String   @unique
+  phone       String
+  address     String
+  birthDate   DateTime
+  birthPlace  String
+  gender      String
+  religion    String
+  nationality String
+  program     String   // Program Studi yang dipilih
+  education   String   // Pendidikan terakhir
+  school      String   // Sekolah asal
+  yearGraduated Int    // Tahun lulus
+  parentName  String   // Nama orang tua
+  parentPhone String   // No. telepon orang tua
+  parentJob   String   // Pekerjaan orang tua
+  status      PMBStatus @default(REGISTERED)
+  registrationDate DateTime @default(now())
+  testScore   Float?   // Nilai tes
+  interviewScore Float? // Nilai wawancara
+  finalScore  Float?   // Nilai akhir
+  notes       String?  // Catatan
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("pmb_applicants")
+}
+
+enum PMBStatus {
+  REGISTERED
+  TEST_SCHEDULED
+  TEST_COMPLETED
+  INTERVIEW_SCHEDULED
+  INTERVIEW_COMPLETED
+  ACCEPTED
+  REJECTED
+  ENROLLED
+}
+
+model FinancialAccount {
+  id          String   @id @default(cuid())
+  studentId   String   @unique
+  student     Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  balance     Float    @default(0)
+  totalDebt   Float    @default(0)
+  totalPaid   Float    @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  transactions FinancialTransaction[]
+
+  @@map("financial_accounts")
+}
+
+model FinancialTransaction {
+  id          String   @id @default(cuid())
+  accountId   String
+  account     FinancialAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  type        TransactionType
+  category    String   // SPP, Uang Pangkal, Ujian, dll
+  amount      Float
+  description String?
+  status      TransactionStatus @default(PENDING)
+  dueDate     DateTime?
+  paidDate    DateTime?
+  paymentMethod String? // Bank Transfer, Cash, Credit Card
+  paymentReference String? // No. Referensi pembayaran
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("financial_transactions")
+}
+
+enum TransactionType {
+  DEBIT   // Pengeluaran/Piutang
+  CREDIT  // Pemasukan/Pembayaran
+}
+
+enum TransactionStatus {
+  PENDING
+  PAID
+  OVERDUE
+  CANCELLED
+}
+
+model Room {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  code        String   @unique
+  capacity    Int
+  type        RoomType @default(CLASSROOM)
+  location    String
+  facilities  String?  // JSON string of facilities
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  schedules   Schedule[]
+
+  @@map("rooms")
+}
+
+model Schedule {
+  id          String   @id @default(cuid())
+  courseId    String
+  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lecturerId  String
+  lecturer    Lecturer @relation(fields: [lecturerId], references: [id], onDelete: Cascade)
+  roomId      String
+  room        Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  day         ScheduleDay
+  startTime   String   // Format: "08:00"
+  endTime     String   // Format: "10:00"
+  semester    Int
+  academicYear String
+  status      ScheduleStatus @default(ACTIVE)
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("schedules")
+}
+
+enum RoomType {
+  CLASSROOM
+  LABORATORY
+  LIBRARY
+  AUDITORIUM
+  MEETING_ROOM
+  OFFICE
+}
+
+enum ScheduleDay {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+enum ScheduleStatus {
+  ACTIVE
+  INACTIVE
+  CANCELLED
+}
+
+model SKPI {
+  id          String   @id @default(cuid())
+  studentId   String
+  student     Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  certificateNumber String @unique
+  issueDate   DateTime
+  validUntil  DateTime?
+  status      SKPIStatus @default(PENDING)
+  activities  SKPIActivity[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("skpi")
+}
+
+model SKPIActivity {
+  id          String   @id @default(cuid())
+  skpiId      String
+  skpi        SKPI     @relation(fields: [skpiId], references: [id], onDelete: Cascade)
+  activityType SKPIActivityType
+  title       String
+  description String?
+  organizer   String
+  location    String?
+  startDate   DateTime
+  endDate     DateTime?
+  position    String?  // Jabatan dalam kegiatan
+  certificate String?  // File sertifikat
+  evidence    String?  // File bukti kegiatan
+  score       Float?   // Nilai/skor kegiatan
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("skpi_activities")
+}
+
+enum SKPIStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  ISSUED
+}
+
+enum SKPIActivityType {
+  ACADEMIC        // Kegiatan Akademik
+  RESEARCH        // Penelitian
+  COMMUNITY_SERVICE // Pengabdian Masyarakat
+  LEADERSHIP      // Kepemimpinan
+  ENTREPRENEURSHIP // Kewirausahaan
+  INTERNATIONAL   // Internasional
+  PROFESSIONAL    // Profesional
+  OTHER          // Lainnya
 }
