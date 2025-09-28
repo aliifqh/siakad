@@ -35,7 +35,7 @@ export default function DashboardPage() {
   const handleLogout = () => {
     localStorage.removeItem('token')
     localStorage.removeItem('user')
-    router.push('/auth/login')
+    router.push('/')
   }
 
   if (loading) {
