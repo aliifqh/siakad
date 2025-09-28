@@ -3,10 +3,12 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { User } from '@/types'
+import PDDIKTIWidget from '@/components/PDDIKTIWidget'
 
 export default function DashboardPage() {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
+  const [showPDDIKTI, setShowPDDIKTI] = useState(false)
   const router = useRouter()
 
   useEffect(() => {
@@ -67,6 +69,12 @@ export default function DashboardPage() {
                 {user.role}
               </span>
               <button
+                onClick={() => setShowPDDIKTI(!showPDDIKTI)}
+                className="px-3 py-1 bg-green-600 text-white rounded-md text-sm hover:bg-green-700"
+              >
+                {showPDDIKTI ? 'Sembunyikan' : 'Tampilkan'} PDDIKTI
+              </button>
+              <button
                 onClick={handleLogout}
                 className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium"
               >
@@ -79,6 +87,13 @@ export default function DashboardPage() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* PDDIKTI Widget */}
+        {showPDDIKTI && (
+          <div className="mb-8">
+            <PDDIKTIWidget />
+          </div>
+        )}
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* Cards berdasarkan role */}
           {user.role === 'ADMIN' && (

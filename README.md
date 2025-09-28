@@ -8,9 +8,9 @@ Sistem Informasi Akademik untuk STIM Surakarta yang dibangun dengan Next.js, Typ
 - ✅ **Role-based Access** - Admin, Dosen, Mahasiswa
 - ✅ **Database Schema** - Mahasiswa, Dosen, Mata Kuliah, KRS, Nilai
 - ✅ **Dashboard** - Interface berbeda berdasarkan role
+- ✅ **PDDIKTI Integration** - Sinkronisasi dengan PDDIKTI menggunakan API wrapper
 - 🔄 **CRUD Operations** - Manajemen data akademik
 - 🔄 **KRS System** - Kartu Rencana Studi
-- 🔄 **PDDIKTI Integration** - Sinkronisasi dengan PDDIKTI
 
 ## Tech Stack
 
@@ -141,12 +141,12 @@ src/
 - `PUT /api/courses/[id]` - Update course
 - `DELETE /api/courses/[id]` - Delete course
 
-### KRS
-- `GET /api/krs` - Get all KRS
-- `POST /api/krs` - Create new KRS
-- `GET /api/krs/[id]` - Get KRS by ID
-- `PUT /api/krs/[id]` - Update KRS
-- `DELETE /api/krs/[id]` - Delete KRS
+### PDDIKTI Integration
+- `GET /api/pddikti/search` - Search data PDDIKTI
+- `GET /api/pddikti/sync/student` - Sync data mahasiswa dari PDDIKTI
+- `GET /api/pddikti/sync/lecturer` - Sync data dosen dari PDDIKTI
+- `GET /api/pddikti/stim` - Get data STIM Surakarta dari PDDIKTI
+- `GET /api/pddikti/statistics` - Get statistik nasional pendidikan tinggi
 
 ## Deployment
 
