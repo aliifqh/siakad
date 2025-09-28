@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
     const semester = searchParams.get('semester')
     const lecturerId = searchParams.get('lecturerId')
 
-    let whereClause: any = {}
+    const whereClause: Record<string, unknown> = {}
 
     if (search) {
       whereClause.OR = [

@@ -4,11 +4,12 @@ import { prisma } from '@/lib/database'
 // GET /api/rooms/[id] - Get, update, or delete specific room
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const room = await prisma.room.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         schedules: {
           include: {
@@ -50,9 +51,10 @@ export async function GET(
 // PUT /api/rooms/[id] - Update room
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const body = await request.json()
     const {
       name, code, capacity, type, location, facilities, isActive
@@ -60,7 +62,7 @@ export async function PUT(
 
     // Cek apakah room ada
     const existingRoom = await prisma.room.findUnique({
-      where: { id: params.id }
+      where: { id }
     })
 
     if (!existingRoom) {
@@ -86,7 +88,7 @@ export async function PUT(
 
     // Update room
     const room = await prisma.room.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         ...(name && { name }),
         ...(code && { code }),
@@ -112,12 +114,13 @@ export async function PUT(
 // DELETE /api/rooms/[id] - Delete room
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     // Cek apakah room ada
     const existingRoom = await prisma.room.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         schedules: {
           where: {
@@ -144,7 +147,7 @@ export async function DELETE(
 
     // Delete room
     await prisma.room.delete({
-      where: { id: params.id }
+      where: { id }
     })
 
     return NextResponse.json({ message: 'Room deleted successfully' })

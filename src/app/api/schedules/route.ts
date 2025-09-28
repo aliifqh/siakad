@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
     const semester = searchParams.get('semester')
     const academicYear = searchParams.get('academicYear')
 
-    let whereClause: any = {}
+    const whereClause: Record<string, unknown> = {}
 
     if (search) {
       whereClause.OR = [

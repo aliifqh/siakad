@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get('status')
     const studentId = searchParams.get('studentId')
 
-    let whereClause: any = {}
+    const whereClause: Record<string, unknown> = {}
 
     if (search) {
       whereClause.OR = [

@@ -99,7 +99,7 @@ export async function GET(request: NextRequest) {
     const analyticsData = {
       students: {
         total: students.length,
-        active: students.filter(s => s.user?.isActive).length,
+        active: students.filter(s => s.status === 'ACTIVE').length,
         graduated: students.filter(s => s.semester >= 8).length,
         byProgram: studentsByProgram.map(item => ({
           program: item.program,

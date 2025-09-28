@@ -4,11 +4,12 @@ import { prisma } from '@/lib/database'
 // GET /api/students/[id] - Get student by ID
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const student = await prisma.student.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         user: {
           select: {
@@ -51,15 +52,16 @@ export async function GET(
 // PUT /api/students/[id] - Update student
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const body = await request.json()
     const { nim, name, email, phone, address, program, semester, status } = body
 
     // Cek apakah student ada
     const existingStudent = await prisma.student.findUnique({
-      where: { id: params.id }
+      where: { id }
     })
 
     if (!existingStudent) {
@@ -74,7 +76,7 @@ export async function PUT(
       const duplicateNim = await prisma.student.findFirst({
         where: {
           nim,
-          id: { not: params.id }
+          id: { not: id }
         }
       })
 
@@ -91,7 +93,7 @@ export async function PUT(
       const duplicateEmail = await prisma.student.findFirst({
         where: {
           email,
-          id: { not: params.id }
+          id: { not: id }
         }
       })
 
@@ -105,7 +107,7 @@ export async function PUT(
 
     // Update student
     const updatedStudent = await prisma.student.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         ...(nim && { nim }),
         ...(name && { name }),
@@ -149,12 +151,13 @@ export async function PUT(
 // DELETE /api/students/[id] - Delete student
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     // Cek apakah student ada
     const existingStudent = await prisma.student.findUnique({
-      where: { id: params.id }
+      where: { id }
     })
 
     if (!existingStudent) {
@@ -166,7 +169,7 @@ export async function DELETE(
 
     // Hapus student (akan cascade ke user karena onDelete: Cascade)
     await prisma.student.delete({
-      where: { id: params.id }
+      where: { id }
     })
 
     return NextResponse.json(

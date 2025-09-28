@@ -135,7 +135,7 @@ export default function SKPIPage() {
 
       if (response.ok) {
         setSkpiList(skpiList.map(skpi => 
-          skpi.id === id ? { ...skpi, status: newStatus as any } : skpi
+          skpi.id === id ? { ...skpi, status: newStatus as 'PENDING' | 'APPROVED' | 'REJECTED' | 'ISSUED' } : skpi
         ))
         alert('Status berhasil diperbarui')
       } else {
@@ -534,7 +534,7 @@ function SKPIFormModal({ skpi, students, onClose, onSave }: {
               <label className="block text-sm font-medium text-gray-700">Status</label>
               <select
                 value={formData.status}
-                onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
+                onChange={(e) => setFormData({ ...formData, status: e.target.value as 'PENDING' | 'APPROVED' | 'REJECTED' | 'ISSUED' })}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="PENDING">Pending</option>
@@ -756,7 +756,7 @@ function ActivityFormModal({ activity, skpiId, onClose, onSave }: {
               <label className="block text-sm font-medium text-gray-700">Tipe Kegiatan</label>
               <select
                 value={formData.activityType}
-                onChange={(e) => setFormData({ ...formData, activityType: e.target.value as any })}
+                onChange={(e) => setFormData({ ...formData, activityType: e.target.value as 'ACADEMIC' | 'RESEARCH' | 'COMMUNITY_SERVICE' | 'LEADERSHIP' | 'ENTREPRENEURSHIP' | 'INTERNATIONAL' | 'PROFESSIONAL' | 'OTHER' })}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               >

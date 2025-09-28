@@ -4,11 +4,12 @@ import { prisma } from '@/lib/database'
 // GET /api/krs/[id] - Get KRS by ID
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const krs = await prisma.kRS.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         student: {
           select: {
@@ -65,15 +66,16 @@ export async function GET(
 // PUT /api/krs/[id] - Update KRS
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const body = await request.json()
     const { studentId, courseId, semester, year, status } = body
 
     // Cek apakah KRS ada
     const existingKRS = await prisma.kRS.findUnique({
-      where: { id: params.id }
+      where: { id }
     })
 
     if (!existingKRS) {
@@ -120,7 +122,7 @@ export async function PUT(
           studentId: studentId || existingKRS.studentId,
           courseId: courseId || existingKRS.courseId,
           semester: semester || existingKRS.semester,
-          id: { not: params.id }
+          id: { not: id }
         }
       })
 
@@ -134,7 +136,7 @@ export async function PUT(
 
     // Update KRS
     const updatedKRS = await prisma.kRS.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         ...(studentId && { studentId }),
         ...(courseId && { courseId }),
@@ -184,12 +186,13 @@ export async function PUT(
 // DELETE /api/krs/[id] - Delete KRS
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     // Cek apakah KRS ada
     const existingKRS = await prisma.kRS.findUnique({
-      where: { id: params.id }
+      where: { id }
     })
 
     if (!existingKRS) {
@@ -217,7 +220,7 @@ export async function DELETE(
 
     // Hapus KRS
     await prisma.kRS.delete({
-      where: { id: params.id }
+      where: { id }
     })
 
     return NextResponse.json(

@@ -4,11 +4,12 @@ import { prisma } from '@/lib/database'
 // GET /api/courses/[id] - Get course by ID
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const course = await prisma.course.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         lecturer: {
           select: {
@@ -70,15 +71,16 @@ export async function GET(
 // PUT /api/courses/[id] - Update course
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const body = await request.json()
     const { code, name, credits, semester, description, lecturerId } = body
 
     // Cek apakah course ada
     const existingCourse = await prisma.course.findUnique({
-      where: { id: params.id }
+      where: { id }
     })
 
     if (!existingCourse) {
@@ -93,7 +95,7 @@ export async function PUT(
       const duplicateCode = await prisma.course.findFirst({
         where: {
           code,
-          id: { not: params.id }
+          id: { not: id }
         }
       })
 
@@ -121,7 +123,7 @@ export async function PUT(
 
     // Update course
     const updatedCourse = await prisma.course.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         ...(code && { code }),
         ...(name && { name }),
@@ -157,12 +159,13 @@ export async function PUT(
 // DELETE /api/courses/[id] - Delete course
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     // Cek apakah course ada
     const existingCourse = await prisma.course.findUnique({
-      where: { id: params.id }
+      where: { id }
     })
 
     if (!existingCourse) {
@@ -174,11 +177,11 @@ export async function DELETE(
 
     // Cek apakah course memiliki KRS atau nilai
     const krsCount = await prisma.kRS.count({
-      where: { courseId: params.id }
+      where: { courseId: id }
     })
 
     const gradesCount = await prisma.grade.count({
-      where: { courseId: params.id }
+      where: { courseId: id }
     })
 
     if (krsCount > 0 || gradesCount > 0) {
@@ -190,7 +193,7 @@ export async function DELETE(
 
     // Hapus course
     await prisma.course.delete({
-      where: { id: params.id }
+      where: { id }
     })
 
     return NextResponse.json(

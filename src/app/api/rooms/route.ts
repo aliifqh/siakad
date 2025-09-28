@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
     const type = searchParams.get('type')
     const isActive = searchParams.get('isActive')
 
-    let whereClause: any = {}
+    const whereClause: Record<string, unknown> = {}
 
     if (search) {
       whereClause.OR = [

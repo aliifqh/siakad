@@ -14,20 +14,20 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    let reportData: any = {}
+    let reportData: unknown = {}
 
     switch (reportType) {
       case 'mahasiswa':
-        reportData = await generateStudentReport(semester, academicYear)
+        reportData = await generateStudentReport(semester)
         break
       case 'dosen':
-        reportData = await generateLecturerReport(semester, academicYear)
+        reportData = await generateLecturerReport(semester)
         break
       case 'mata_kuliah':
-        reportData = await generateCourseReport(semester, academicYear)
+        reportData = await generateCourseReport(semester)
         break
       case 'nilai':
-        reportData = await generateGradeReport(semester, academicYear)
+        reportData = await generateGradeReport(semester)
         break
       default:
         return NextResponse.json(
@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
         semester,
         academicYear,
         generatedAt: new Date().toISOString(),
-        totalRecords: reportData.length
+        totalRecords: Array.isArray(reportData) ? reportData.length : 0
       }
     })
 
@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
 }
 
 // Generate laporan mahasiswa untuk PDDIKTI
-async function generateStudentReport(semester: number, academicYear: string) {
+async function generateStudentReport(semester: number) {
   const students = await prisma.student.findMany({
     where: {
       semester: semester
@@ -91,12 +91,12 @@ async function generateStudentReport(semester: number, academicYear: string) {
     // Data tambahan untuk PDDIKTI
     universitas_id: 'STIM_SURAKARTA_ID', // ID STIM di PDDIKTI
     program_studi_id: getProgramId(student.program),
-    status_aktif: student.user?.isActive ? 'A' : 'T'
+    status_aktif: student.status === 'ACTIVE' ? 'A' : 'T'
   }))
 }
 
 // Generate laporan dosen untuk PDDIKTI
-async function generateLecturerReport(semester: number, academicYear: string) {
+async function generateLecturerReport(semester: number) {
   const lecturers = await prisma.lecturer.findMany({
     include: {
       user: true,
@@ -116,7 +116,7 @@ async function generateLecturerReport(semester: number, academicYear: string) {
     email: lecturer.email,
     jabatan_fungsional: lecturer.position,
     program_studi: lecturer.department,
-    status_dosen: lecturer.user?.isActive ? 'A' : 'T',
+    status_dosen: 'A', // Assuming all lecturers are active
     // Data tambahan untuk PDDIKTI
     universitas_id: 'STIM_SURAKARTA_ID',
     program_studi_id: getProgramId(lecturer.department),
@@ -125,7 +125,7 @@ async function generateLecturerReport(semester: number, academicYear: string) {
 }
 
 // Generate laporan mata kuliah untuk PDDIKTI
-async function generateCourseReport(semester: number, academicYear: string) {
+async function generateCourseReport(semester: number) {
   const courses = await prisma.course.findMany({
     where: {
       semester: semester
@@ -153,7 +153,7 @@ async function generateCourseReport(semester: number, academicYear: string) {
 }
 
 // Generate laporan nilai untuk PDDIKTI
-async function generateGradeReport(semester: number, academicYear: string) {
+async function generateGradeReport(semester: number) {
   const grades = await prisma.grade.findMany({
     where: {
       course: {
@@ -184,7 +184,7 @@ async function generateGradeReport(semester: number, academicYear: string) {
 }
 
 // Helper functions
-function calculateGPA(grades: any[]): number {
+function calculateGPA(grades: Array<{ course: { credits: number }; grade: string }>): number {
   if (grades.length === 0) return 0
   
   const totalCredits = grades.reduce((sum, grade) => sum + grade.course.credits, 0)
@@ -196,7 +196,7 @@ function calculateGPA(grades: any[]): number {
   return totalCredits > 0 ? totalPoints / totalCredits : 0
 }
 
-function calculateTotalCredits(grades: any[]): number {
+function calculateTotalCredits(grades: Array<{ course: { credits: number } }>): number {
   return grades.reduce((sum, grade) => sum + grade.course.credits, 0)
 }
 

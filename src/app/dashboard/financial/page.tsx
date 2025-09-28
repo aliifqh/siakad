@@ -120,7 +120,7 @@ export default function FinancialPage() {
         setTransactions(transactions.map(transaction => 
           transaction.id === id ? { 
             ...transaction, 
-            status: newStatus as any,
+            status: newStatus as 'PENDING' | 'PAID' | 'OVERDUE' | 'CANCELLED',
             paidDate: newStatus === 'PAID' ? new Date().toISOString() : transaction.paidDate
           } : transaction
         ))
@@ -543,7 +543,7 @@ function TransactionFormModal({ transaction, accounts, onClose, onSave }: {
               <label className="block text-sm font-medium text-gray-700">Tipe Transaksi</label>
               <select
                 value={formData.type}
-                onChange={(e) => setFormData({ ...formData, type: e.target.value as any })}
+                onChange={(e) => setFormData({ ...formData, type: e.target.value as 'DEBIT' | 'CREDIT' })}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               >
@@ -606,7 +606,7 @@ function TransactionFormModal({ transaction, accounts, onClose, onSave }: {
               <label className="block text-sm font-medium text-gray-700">Status</label>
               <select
                 value={formData.status}
-                onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
+                onChange={(e) => setFormData({ ...formData, status: e.target.value as 'PENDING' | 'PAID' | 'OVERDUE' | 'CANCELLED' })}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="PENDING">Pending</option>

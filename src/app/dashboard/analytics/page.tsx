@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 
 interface AnalyticsData {
   students: {
@@ -46,11 +46,7 @@ export default function AnalyticsPage() {
   const [dateRange, setDateRange] = useState('30') // days
   const [selectedChart, setSelectedChart] = useState('students')
 
-  useEffect(() => {
-    fetchAnalyticsData()
-  }, [dateRange])
-
-  const fetchAnalyticsData = async () => {
+  const fetchAnalyticsData = useCallback(async () => {
     try {
       const response = await fetch(`/api/analytics?range=${dateRange}`)
       if (response.ok) {
@@ -62,7 +58,11 @@ export default function AnalyticsPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [dateRange])
+
+  useEffect(() => {
+    fetchAnalyticsData()
+  }, [fetchAnalyticsData])
 
   const exportReport = async (format: 'pdf' | 'excel') => {
     try {

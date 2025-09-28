@@ -4,11 +4,12 @@ import { prisma } from '@/lib/database'
 // GET /api/pmb/[id] - Get PMB applicant by ID
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const applicant = await prisma.pMBApplicant.findUnique({
-      where: { id: params.id }
+      where: { id }
     })
 
     if (!applicant) {
@@ -32,9 +33,10 @@ export async function GET(
 // PUT /api/pmb/[id] - Update PMB applicant
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const body = await request.json()
     const {
       name, email, phone, address, birthDate, birthPlace, gender, religion,
@@ -44,7 +46,7 @@ export async function PUT(
 
     // Cek apakah applicant ada
     const existingApplicant = await prisma.pMBApplicant.findUnique({
-      where: { id: params.id }
+      where: { id }
     })
 
     if (!existingApplicant) {
@@ -59,7 +61,7 @@ export async function PUT(
       const duplicateEmail = await prisma.pMBApplicant.findFirst({
         where: {
           email,
-          id: { not: params.id }
+          id: { not: id }
         }
       })
 
@@ -73,7 +75,7 @@ export async function PUT(
 
     // Update applicant
     const updatedApplicant = await prisma.pMBApplicant.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         ...(name && { name }),
         ...(email && { email }),
@@ -113,12 +115,13 @@ export async function PUT(
 // DELETE /api/pmb/[id] - Delete PMB applicant
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     // Cek apakah applicant ada
     const existingApplicant = await prisma.pMBApplicant.findUnique({
-      where: { id: params.id }
+      where: { id }
     })
 
     if (!existingApplicant) {
@@ -130,7 +133,7 @@ export async function DELETE(
 
     // Hapus applicant
     await prisma.pMBApplicant.delete({
-      where: { id: params.id }
+      where: { id }
     })
 
     return NextResponse.json(

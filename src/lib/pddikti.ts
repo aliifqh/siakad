@@ -59,7 +59,7 @@ class PDDIKTIService {
   }
 
   // Search endpoints
-  async searchAll(query: string): Promise<any> {
+  async searchAll(query: string): Promise<Record<string, unknown>> {
     try {
       const response = await fetch(`${this.baseURL}/search?q=${encodeURIComponent(query)}`)
       if (!response.ok) throw new Error('Failed to fetch search results')

@@ -39,7 +39,7 @@ export default function LoginPage() {
       } else {
         setError(data.error || 'Login gagal')
       }
-    } catch (error) {
+    } catch {
       setError('Terjadi kesalahan server')
     } finally {
       setLoading(false)

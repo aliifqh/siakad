@@ -52,7 +52,7 @@ export default function RegisterPage() {
       } else {
         setError(data.error || 'Registrasi gagal')
       }
-    } catch (error) {
+    } catch {
       setError('Terjadi kesalahan server')
     } finally {
       setLoading(false)

@@ -4,11 +4,12 @@ import { prisma } from '@/lib/database'
 // GET /api/schedules/[id] - Get specific schedule
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const schedule = await prisma.schedule.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         course: {
           select: {
@@ -56,9 +57,10 @@ export async function GET(
 // PUT /api/schedules/[id] - Update schedule
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const body = await request.json()
     const {
       courseId, lecturerId, roomId, day, startTime, endTime,
@@ -67,7 +69,7 @@ export async function PUT(
 
     // Cek apakah schedule ada
     const existingSchedule = await prisma.schedule.findUnique({
-      where: { id: params.id }
+      where: { id }
     })
 
     if (!existingSchedule) {
@@ -88,7 +90,7 @@ export async function PUT(
           roomId: roomId || existingSchedule.roomId,
           day: day || existingSchedule.day,
           status: 'ACTIVE',
-          id: { not: params.id },
+          id: { not: id },
           OR: [
             {
               AND: [
@@ -122,7 +124,7 @@ export async function PUT(
 
     // Update schedule
     const schedule = await prisma.schedule.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         ...(courseId && { courseId }),
         ...(lecturerId && { lecturerId }),
@@ -171,12 +173,13 @@ export async function PUT(
 // DELETE /api/schedules/[id] - Delete schedule
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     // Cek apakah schedule ada
     const existingSchedule = await prisma.schedule.findUnique({
-      where: { id: params.id }
+      where: { id }
     })
 
     if (!existingSchedule) {
@@ -188,7 +191,7 @@ export async function DELETE(
 
     // Delete schedule
     await prisma.schedule.delete({
-      where: { id: params.id }
+      where: { id }
     })
 
     return NextResponse.json({ message: 'Schedule deleted successfully' })

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { pddiktiService, PDDIKTIUniversity, PDDIKTIStats } from '@/lib/pddikti'
+import { PDDIKTIUniversity, PDDIKTIStats } from '@/lib/pddikti'
 
 export default function PDDIKTIWidget() {
   const [stimData, setStimData] = useState<PDDIKTIUniversity | null>(null)
@@ -173,10 +173,18 @@ export default function PDDIKTIWidget() {
   )
 }
 
+interface SearchResult {
+  id: string
+  name: string
+  type: string
+  location?: string
+  website?: string
+}
+
 function PDDIKTISearchWidget() {
   const [query, setQuery] = useState('')
   const [type, setType] = useState('all')
-  const [results, setResults] = useState<any[]>([])
+  const [results, setResults] = useState<SearchResult[]>([])
   const [loading, setLoading] = useState(false)
 
   const handleSearch = async () => {
@@ -239,10 +247,10 @@ function PDDIKTISearchWidget() {
             {results.map((result, index) => (
               <div key={index} className="p-3 border border-gray-200 rounded-md">
                 <div className="text-sm font-medium text-gray-900">
-                  {result.nama || result.name || 'N/A'}
+                  {result.name || 'N/A'}
                 </div>
                 <div className="text-xs text-gray-500">
-                  {result.nim || result.nidn || result.id || 'ID tidak tersedia'}
+                  {result.id || 'ID tidak tersedia'}
                 </div>
               </div>
             ))}

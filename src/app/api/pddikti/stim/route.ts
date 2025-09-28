@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { pddiktiService } from '@/lib/pddikti'
 
 // GET /api/pddikti/stim - Get STIM Surakarta data dari PDDIKTI

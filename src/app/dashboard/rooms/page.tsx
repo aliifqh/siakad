@@ -633,7 +633,7 @@ function RoomFormModal({ room, onClose, onSave }: {
               <label className="block text-sm font-medium text-gray-700">Tipe Ruangan</label>
               <select
                 value={formData.type}
-                onChange={(e) => setFormData({ ...formData, type: e.target.value as any })}
+                onChange={(e) => setFormData({ ...formData, type: e.target.value as 'CLASSROOM' | 'LABORATORY' | 'LIBRARY' | 'AUDITORIUM' | 'MEETING_ROOM' | 'OFFICE' })}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               >
@@ -824,7 +824,7 @@ function ScheduleFormModal({ schedule, courses, lecturers, rooms, onClose, onSav
               <label className="block text-sm font-medium text-gray-700">Hari</label>
               <select
                 value={formData.day}
-                onChange={(e) => setFormData({ ...formData, day: e.target.value as any })}
+                onChange={(e) => setFormData({ ...formData, day: e.target.value as 'MONDAY' | 'TUESDAY' | 'WEDNESDAY' | 'THURSDAY' | 'FRIDAY' | 'SATURDAY' | 'SUNDAY' })}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               >
@@ -891,7 +891,7 @@ function ScheduleFormModal({ schedule, courses, lecturers, rooms, onClose, onSav
               <label className="block text-sm font-medium text-gray-700">Status</label>
               <select
                 value={formData.status}
-                onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
+                onChange={(e) => setFormData({ ...formData, status: e.target.value as 'ACTIVE' | 'INACTIVE' | 'CANCELLED' })}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="ACTIVE">Aktif</option>

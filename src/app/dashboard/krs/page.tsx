@@ -12,7 +12,6 @@ export default function KRSPage() {
   const [showAddForm, setShowAddForm] = useState(false)
   const [editingKRS, setEditingKRS] = useState<KRS | null>(null)
   const [currentSemester, setCurrentSemester] = useState('2024/2025-Ganjil')
-  const [currentYear, setCurrentYear] = useState(2024)
 
   useEffect(() => {
     fetchKRS()
@@ -351,7 +350,7 @@ export default function KRSPage() {
           courses={courses}
           students={students}
           currentSemester={currentSemester}
-          currentYear={currentYear}
+          currentYear={2024}
           onClose={() => {
             setShowAddForm(false)
             setEditingKRS(null)
@@ -488,7 +487,7 @@ function KRSFormModal({ krs, courses, students, currentSemester, currentYear, on
               <label className="block text-sm font-medium text-gray-700">Status</label>
               <select
                 value={formData.status}
-                onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
+                onChange={(e) => setFormData({ ...formData, status: e.target.value as 'PENDING' | 'APPROVED' | 'REJECTED' })}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="PENDING">Pending</option>

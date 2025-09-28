@@ -1,5 +1,43 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/database'
+
+// Types for analytics data
+interface AnalyticsData {
+  students: {
+    total: number
+    active: number
+    graduated: number
+    byProgram: Array<{ program: string; count: number }>
+    bySemester: Array<{ semester: number; count: number }>
+  }
+  lecturers: {
+    total: number
+    byPosition: Array<{ position: string; count: number }>
+    byDepartment: Array<{ department: string; count: number }>
+  }
+  courses: {
+    total: number
+    totalCredits: number
+    bySemester: Array<{ semester: number; count: number }>
+  }
+  krs: {
+    total: number
+    approved: number
+    pending: number
+    rejected: number
+  }
+  financial: {
+    totalDebt: number
+    totalPaid: number
+    pendingAmount: number
+    overdueAmount: number
+  }
+  pmb: {
+    totalApplicants: number
+    accepted: number
+    rejected: number
+    enrolled: number
+  }
+}
 
 // GET /api/analytics/export - Export analytics report
 export async function GET(request: NextRequest) {
@@ -44,7 +82,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-function generateExcelData(data: any): string {
+function generateExcelData(data: AnalyticsData): string {
   // Simplified Excel generation (in real implementation, use a library like xlsx)
   const csvData = [
     ['Laporan Analytics STIM Surakarta'],
@@ -56,26 +94,26 @@ function generateExcelData(data: any): string {
     ['Mahasiswa Lulus', data.students.graduated],
     [''],
     ['Mahasiswa per Program:'],
-    ...data.students.byProgram.map((item: any) => [item.program, item.count]),
+    ...data.students.byProgram.map((item) => [item.program, item.count]),
     [''],
     ['Mahasiswa per Semester:'],
-    ...data.students.bySemester.map((item: any) => [`Semester ${item.semester}`, item.count]),
+    ...data.students.bySemester.map((item) => [`Semester ${item.semester}`, item.count]),
     [''],
     ['DOSEN'],
     ['Total Dosen', data.lecturers.total],
     [''],
     ['Dosen per Jabatan:'],
-    ...data.lecturers.byPosition.map((item: any) => [item.position, item.count]),
+    ...data.lecturers.byPosition.map((item) => [item.position, item.count]),
     [''],
     ['Dosen per Departemen:'],
-    ...data.lecturers.byDepartment.map((item: any) => [item.department, item.count]),
+    ...data.lecturers.byDepartment.map((item) => [item.department, item.count]),
     [''],
     ['MATA KULIAH'],
     ['Total Mata Kuliah', data.courses.total],
     ['Total SKS', data.courses.totalCredits],
     [''],
     ['Mata Kuliah per Semester:'],
-    ...data.courses.bySemester.map((item: any) => [`Semester ${item.semester}`, item.count]),
+    ...data.courses.bySemester.map((item) => [`Semester ${item.semester}`, item.count]),
     [''],
     ['KRS'],
     ['Total KRS', data.krs.total],
@@ -99,7 +137,7 @@ function generateExcelData(data: any): string {
   return csvData.map(row => row.join(',')).join('\n')
 }
 
-function generatePDFData(data: any): string {
+function generatePDFData(data: AnalyticsData): string {
   // Simplified PDF generation (in real implementation, use a library like puppeteer or jsPDF)
   const htmlContent = `
     <!DOCTYPE html>
@@ -146,7 +184,7 @@ function generatePDFData(data: any): string {
       <h2>Mahasiswa</h2>
       <table>
         <tr><th>Program Studi</th><th>Jumlah</th></tr>
-        ${data.students.byProgram.map((item: any) => 
+        ${data.students.byProgram.map((item) => 
           `<tr><td>${item.program}</td><td>${item.count}</td></tr>`
         ).join('')}
       </table>
@@ -154,7 +192,7 @@ function generatePDFData(data: any): string {
       <h2>Dosen</h2>
       <table>
         <tr><th>Jabatan</th><th>Jumlah</th></tr>
-        ${data.lecturers.byPosition.map((item: any) => 
+        ${data.lecturers.byPosition.map((item) => 
           `<tr><td>${item.position}</td><td>${item.count}</td></tr>`
         ).join('')}
       </table>
